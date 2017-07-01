@@ -12,19 +12,41 @@ import java.util.ArrayList;
 
 public class SelectOperation extends Operation{
     ClipBoard clip;
+    boolean click;
+
+    /**
+     * Constructor assumes that this operation is created upon click
+     * and updated upon drag
+     * @param clip - this operation only manipulates the selection, that is contained in the ClipBoard
+     */
     public SelectOperation(ClipBoard clip){
+        this.click = true;
         this.clip = clip;
     }
 
     @Override
     public void applyOperation() {
         if(this.stored instanceof ArrayList){
-            clip.setSelection((ArrayList<Object>) this.changed);
+            if(click){
+                System.out.print("Click select requested!\n");
+            }else {
+                clip.setSelection((ArrayList<Object>) this.changed);
+            }
         }
     }
 
     @Override
     public void undoOperation(){
         clip.setSelection((ArrayList<Object>) this.stored);
+    }
+
+    public boolean isClick(){
+        return click;
+    }
+    public void setClick(boolean click){
+        if(!click){
+            clip.clearClickObjectSelection();
+        }
+        this.click = click;
     }
 }

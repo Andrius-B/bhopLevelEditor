@@ -75,13 +75,19 @@ public class InputEventProcessor {
     }
     public void processTouchDownEvent(int x, int y, int pointer, int button){
         if(button == Input.Buttons.LEFT && selectPointer<=0){
+            /**
+             * a simple left click performs single object selection:
+             * cycles through all the objects that are underneath the pointer
+             */
             System.out.print("Pre new selection Selection contains:"+clip.getSelection().size()+"\n");
             currentOperation = new SelectOperation(clip);
             currentOperation.setOperation(clip.getSelection(), clip.getTempSelection());
             selectPointer = pointer;
             selectTouch = parent.getWorldCoordinates(x,y);
             selectBox = new Rectangle(selectTouch.x-1, selectTouch.y-1, 2,2);
-            clip.setTempSelection(parent.findSelected(selectBox, false));
+            ArrayList<Object> selection = parent.findSelected(selectBox, false);
+            clip.setTempSelection(selection);
+            clip.setClickObjectSelection(selection);
         }else{
             selectPointer = -1;
         }
@@ -90,6 +96,9 @@ public class InputEventProcessor {
 
     public void processTouchDraggedEvent(int x, int y, int pointer){
         if(pointer == selectPointer){
+            /**
+             * Selection pointer moved -> area measurement for box selection
+             */
             Vector2 newPos = parent.getWorldCoordinates(x,y);
             float minx = Math.min(selectTouch.x, newPos.x);
             float miny = Math.min(selectTouch.y, newPos.y);
@@ -97,11 +106,14 @@ public class InputEventProcessor {
             float dy = Math.abs(newPos.y - selectTouch.y);
             selectBox = new Rectangle(minx, miny, dx, dy);
             clip.setTempSelection(parent.findSelected(selectBox, false));
+            if(currentOperation instanceof SelectOperation && (dx*dx+dy*dy>=5*5)){ // if the dist is more than 5px then its a drag and not a click
+                ((SelectOperation) currentOperation).setClick(false);
+            }
         }
 
     }
     public void processTouchUpEvent(int x, int y, int pointer, int button){
-        if(pointer == selectPointer){
+        if(pointer == selectPointer && currentOperation instanceof SelectOperation){
             Vector2 newPos = parent.getWorldCoordinates(x,y);
             float minx = Math.min(selectTouch.x, newPos.x);
             float miny = Math.min(selectTouch.y, newPos.y);
@@ -113,13 +125,22 @@ public class InputEventProcessor {
             selectPointer = -1;
             selectTouch = new Vector2();
             /**
-             * This is actually the place where a new Select operation should be pushed to the
+             * This is the place where a new Select operation should be pushed to the
              * operation stack, because while mid selection there is no point in creating a transformation
-             * Either way this is only temporary selection for the moment
              */
-            currentOperation.setOperation(currentOperation.getOriginal(), clip.getTempSelection());
-            addOperation(currentOperation);
-            clip.setTempSelection(new ArrayList<Object>(0));
+            if(!((SelectOperation) currentOperation).isClick()) {
+                /**
+                 * Box select
+                 */
+                currentOperation.setOperation(currentOperation.getOriginal(), clip.getTempSelection());
+                addOperation(currentOperation);
+                clip.setTempSelection(new ArrayList<Object>(0));
+            }else{
+                /**
+                 * Click select
+                 */
+                System.out.print("//////////////////Click selection the same: "+clip.sameClickSelection(clip.getTempSelection())+"\n");
+            }
         }
     }
 

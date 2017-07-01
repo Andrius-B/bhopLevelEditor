@@ -14,11 +14,16 @@ import java.util.ArrayList;
 public class ClipBoard {
     private ArrayList<Object> tempSelection;
     private ArrayList<Object> selection;
+    private ArrayList<Object> clickObjectSelection;
+
 
     public ClipBoard(){
         tempSelection = new ArrayList<Object>(0);
         selection = new ArrayList<Object>(0);
+        clickObjectSelection = new ArrayList<Object>(0);
     }
+
+
 
     public void setTempSelection(ArrayList<Object> selection){
         this.tempSelection = selection;
@@ -66,5 +71,22 @@ public class ClipBoard {
 
     public ArrayList<Object> getTempSelection(){
         return tempSelection;
+    }
+
+    public boolean sameClickSelection(ArrayList<Object> newSelection){
+        /**
+         * this function has some shortcircuits
+         */
+        if(newSelection.size() != clickObjectSelection.size())return false;
+        for(int i = 0; i < newSelection.size(); i++){
+            if(newSelection.get(i)!=clickObjectSelection.get(i))return false;
+        }
+        return true;
+    }
+    public void setClickObjectSelection(ArrayList<Object> select){
+        this.clickObjectSelection = select;
+    }
+    public void clearClickObjectSelection(){
+        this.clickObjectSelection.clear();
     }
 }
