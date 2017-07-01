@@ -13,6 +13,7 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
@@ -31,6 +32,8 @@ import java.util.TimerTask;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 
 
 public class DesktopLauncher {
@@ -224,7 +227,6 @@ public class DesktopLauncher {
 
 		ModifyPanel modifyPanel = new ModifyPanel();
 		Box modifyPanelBox = new Box(BoxLayout.Y_AXIS);
-		modifyPanelBox.add(Box.createHorizontalStrut(15));
 		modifyPanelBox.add(modifyPanel);
 
 		frame.setLayout(new GridBagLayout());
@@ -232,8 +234,10 @@ public class DesktopLauncher {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 1;
-		gbc.weightx = 0.3;
-		gbc.weighty = 1.0;
+		gbc.weightx = 0.3; //the modify panel has to be much smaller than the canvas
+		gbc.weighty = 0.5;
+		gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+		gbc.insets = new Insets(8,8,8,8); //some padding
 		frame.add(modifyPanelBox, gbc);
 
 		gbc.gridx = 1;
@@ -242,6 +246,7 @@ public class DesktopLauncher {
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
 		gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+		gbc.insets = new Insets(0,0,0,0);//remove the padding
 		frame.add(canvas, gbc);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);

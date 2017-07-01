@@ -35,6 +35,8 @@ public class ModifyPanel extends Panel {
         addNewInputField("hey", "love", gbc);
         addNewInputField("?", "up or perhaps some long content?", gbc);
 
+
+
     }
     public ArrayList<Component> addNewInputField(String labelText, String content, GridBagConstraints c){
         ArrayList<Component> inputRow = new ArrayList<Component>(0);
