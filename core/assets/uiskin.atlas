@@ -1,0 +1,51 @@
+
+uiMaterial.png
+size: 512,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+check-off
+  rotate: false
+  xy: 230, 54
+  size: 170, 170
+  orig: 170, 170
+  offset: 0, 0
+  index: -1
+check-on
+  rotate: false
+  xy: 230, 222
+  size: 170, 170
+  orig: 170, 170
+  offset: 0, 0
+  index: -1
+default-rect-down
+  rotate: false
+  xy: 0, 230
+  size: 170, 170
+  split: 15, 15, 15, 15
+  orig: 170, 170
+  offset: 0, 0
+  index: -1
+default-rect
+  rotate: false
+  xy: 230, 54
+  size: 170, 170
+  split: 15, 15, 15, 15
+  orig: 170, 170
+  offset: 0, 0
+  index: -1
+theme-slider
+  rotate: false
+  xy: 230, 0
+  size: 52, 50
+  split: 25, 25, 25, 25
+  orig: 52, 50
+  offset: 0, 0
+  index: -1
+theme-slider-knob
+  rotate: false
+  xy: 0, 0
+  size: 230, 230
+  orig: 230, 230
+  offset: 0, 0
+  index: -1
