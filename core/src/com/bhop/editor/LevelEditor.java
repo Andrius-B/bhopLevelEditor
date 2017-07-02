@@ -39,6 +39,7 @@ public class LevelEditor extends ApplicationAdapter {
     public LevelEditor(){
         commands = new Queue<InputEvent>();
     }
+
 	
 	@Override
 	public void create () {
@@ -52,6 +53,19 @@ public class LevelEditor extends ApplicationAdapter {
         Gdx.input.setInputProcessor(r);
         created = true;
 	}
+
+    /**
+     * Fetch the single object if a single object is selected
+     * @return Object or null if not one selected
+     */
+    public Object getSingleSelection(){
+        if(r!=null && r.getSelection()!=null && r.getSelection().size()==1){
+            ArrayList<Object> selection =r.getSelection();
+            return selection.get(0);
+        }else{
+            return null;
+        }
+    }
 
 	@Override
 	public void render () {

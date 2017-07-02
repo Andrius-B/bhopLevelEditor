@@ -204,6 +204,10 @@ public class Renderer implements InputProcessor {
         sr.dispose();
     }
 
+    public ArrayList<Object> getSelection(){
+        return inputEventProcessor.clip.getSelection();
+    }
+
     public void changeRenderMethod(){
         textured = !textured;
     }

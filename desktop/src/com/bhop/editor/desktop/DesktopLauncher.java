@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.bhop.editor.LevelEditor;
+import com.bunny.jump.Game.Objects.Object;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
@@ -225,7 +226,7 @@ public class DesktopLauncher {
 		//add menubar to the frame
 		frame.setMenuBar(menuBar);
 
-		ModifyPanel modifyPanel = new ModifyPanel();
+		final ModifyPanel modifyPanel = new ModifyPanel();
 		Box modifyPanelBox = new Box(BoxLayout.Y_AXIS);
 		modifyPanelBox.add(modifyPanel);
 
@@ -253,7 +254,7 @@ public class DesktopLauncher {
 
 		toggleViewMenuItem.dispatchEvent(new ActionEvent(toggleViewMenuItem, 500, "Wireframe"));
 
-		EventPoller task = new EventPoller(lvlEditor);
+		EventPoller task = new EventPoller(lvlEditor, modifyPanel);
 		Timer eventTimer = new Timer("eventTimer");
 		eventTimer.schedule(task, 10, 5);
 
@@ -285,11 +286,26 @@ public class DesktopLauncher {
  */
 class EventPoller extends TimerTask{
 	LevelEditor lvlEditor;
-	public EventPoller(LevelEditor lvlEditor){
+	com.bunny.jump.Game.Objects.Object modObject;
+	ModifyPanel modifyPanel;
+	public EventPoller(LevelEditor lvlEditor, ModifyPanel modifyPanel){
 		this.lvlEditor = lvlEditor;
+		this.modifyPanel = modifyPanel;
 	}
 
 	public void run(){
+		/**
+		 * Object selection to modify panel transfer
+		 */
+		if(lvlEditor.getSingleSelection()!=null && modObject!=lvlEditor.getSingleSelection()){
+			modifyPanel.setObject(lvlEditor.getSingleSelection());
+			modObject = lvlEditor.getSingleSelection();
+		}
+
+
+		/**
+		 * SHORTCUT HANDLES:
+		 */
 		com.bhop.editor.Util.InputEvent e = lvlEditor.getCommand();
 		if(e.keycode !=-1){
 			if(e.keycode == Input.Keys.N && e.ctrlModifier && !e.shiftModifier){
@@ -340,7 +356,7 @@ class EventPoller extends TimerTask{
 }
 
 /**
- * Handling of things avaiable through the menuBar:
+ * Handling of things available through the menuBar:
  */
 
 class FileItemListener implements ActionListener {

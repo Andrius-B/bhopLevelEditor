@@ -29,6 +29,7 @@ public class SelectOperation extends Operation{
         if(this.stored instanceof ArrayList){
             if(click){
                 System.out.print("Click select requested!\n");
+                clip.setSelection((ArrayList<Object>) this.changed);
             }else {
                 clip.setSelection((ArrayList<Object>) this.changed);
             }
@@ -44,9 +45,6 @@ public class SelectOperation extends Operation{
         return click;
     }
     public void setClick(boolean click){
-        if(!click){
-            clip.clearClickObjectSelection();
-        }
         this.click = click;
     }
 }

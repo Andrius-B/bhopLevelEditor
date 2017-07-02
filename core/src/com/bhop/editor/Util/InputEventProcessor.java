@@ -30,6 +30,7 @@ public class InputEventProcessor {
     private int selectPointer;
     private Vector2 selectTouch;
     private Operation currentOperation;
+    int clickSelectionCounter = 0;
 
     /**
      * Operation stack
@@ -139,7 +140,20 @@ public class InputEventProcessor {
                 /**
                  * Click select
                  */
-                System.out.print("//////////////////Click selection the same: "+clip.sameClickSelection(clip.getTempSelection())+"\n");
+                if(clip.sameClickSelection(clip.getTempSelection())){ //I am not exactly sure why I wrote this check or what it does
+                    if(clickSelectionCounter>=clip.getTempSelection().size()){
+                        clickSelectionCounter = 0;
+                        if(clip.getTempSelection().size()==0)return; //clicked on nothing
+                    }
+                    ArrayList<Object> clickObject = new ArrayList<Object>(0);
+                    clickObject.add(clip.getTempSelection().get(clickSelectionCounter));
+                    clickSelectionCounter++;
+                    currentOperation.setOperation(currentOperation.getOriginal(), clickObject);
+                    addOperation(currentOperation);
+                    //clip.setSelection(clickObject);
+                    clip.setTempSelection(new ArrayList<Object>(0));
+                    System.out.print("Click select operation added:"+clickObject.get(0).getType()+" selected\n");
+                }
             }
         }
     }
