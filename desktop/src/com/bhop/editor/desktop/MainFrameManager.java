@@ -6,10 +6,13 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.bhop.editor.LevelEditor;
 
+import org.lwjgl.opengl.GREMEDYFrameTerminator;
+
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Frame;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -37,14 +40,18 @@ import javax.swing.BoxLayout;
  * data transfer between the GUI and libgdx app
  */
 
-public class MainFrame extends Frame {
-    public MainFrame(){
-        final LevelEditor lvlEditor = new LevelEditor();
+public class MainFrameManager {
+    private LevelEditor lvlEditor;
+    private  Frame frame;
+    private Canvas canvas;
+    public MainFrameManager(){
+        lvlEditor = new LevelEditor();
+
 
         /**
          * Preparing the frame
          */
-        final Frame frame = new Frame("bhop level editor");
+        frame = new Frame("bhop level editor");
         frame.setSize(1024, 720);
         //window close handling:
         frame.addWindowListener(new WindowAdapter(){
@@ -66,9 +73,8 @@ public class MainFrame extends Frame {
         config.height = 720;
         config.width = 1024;
         config.samples = 4;//antialiasing
-        final Canvas canvas = new Canvas();
-        Dimension d = new Dimension((int)frame.getSize().getWidth()*5/7, frame.getHeight()*6/7);
-        canvas.setPreferredSize(d);
+        canvas = new Canvas();
+        adjustCanvasSize();
         LwjglApplication app = new LwjglApplication(lvlEditor, config, canvas);
 
 
@@ -78,9 +84,7 @@ public class MainFrame extends Frame {
         frame.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
-                Dimension d = new Dimension((int)frame.getSize().getWidth()*80/100, frame.getHeight()*95/100);
-                canvas.setSize(d);
-                System.out.print("Resize operation\n");
+                adjustCanvasSize();
             }
 
             @Override
@@ -222,7 +226,7 @@ public class MainFrame extends Frame {
         //add menubar to the frame
         frame.setMenuBar(menuBar);
 
-        final ModifyPanel modifyPanel = new ModifyPanel();
+        final ModifyPanel modifyPanel = new ModifyPanel(this);
         Box modifyPanelBox = new Box(BoxLayout.Y_AXIS);
         modifyPanelBox.add(modifyPanel);
 
@@ -232,7 +236,7 @@ public class MainFrame extends Frame {
         gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.weightx = 0.3; //the modify panel has to be much smaller than the canvas
-        gbc.weighty = 0.5;
+        gbc.weighty = 1;
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
         gbc.insets = new Insets(8,8,8,8); //some padding
         frame.add(modifyPanelBox, gbc);
@@ -244,11 +248,10 @@ public class MainFrame extends Frame {
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
         gbc.insets = new Insets(0,0,0,0);//remove the padding
+        gbc.fill = GridBagConstraints.BOTH;
         frame.add(canvas, gbc);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-
-        toggleViewMenuItem.dispatchEvent(new ActionEvent(toggleViewMenuItem, 500, "Wireframe"));
 
         EventPoller task = new EventPoller(lvlEditor, modifyPanel);
         Timer eventTimer = new Timer("eventTimer");
@@ -269,6 +272,23 @@ public class MainFrame extends Frame {
         /**
          * TESTING WINDOW END
          */
+    }
+    public void adjustCanvasSize(){
+        Graphics g = frame.getGraphics();
+        Dimension d = new Dimension((int)frame.getSize().getWidth(), frame.getHeight());
+        //canvas.setPreferredSize(d);
+        /*System.out.print("Canvas size:"+canvas.getWidth()+";"+canvas.getHeight()+"\n"+
+                         "Prefered size:"+canvas.getPreferredSize().getWidth()+";"+canvas.getPreferredSize().getHeight()+"\n");
+        */
+        /**
+         * The gridbag is supposed to scale accordingly to the window size
+         */
+        canvas.doLayout();
+        frame.doLayout();
+        frame.validate();
+        frame.update(g);
+        frame.paintAll(g);
+        System.out.print("Resize operation\n");
     }
 }
 

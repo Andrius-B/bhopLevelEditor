@@ -23,20 +23,21 @@ import java.util.ArrayList;
 
 /**
  * Created by Andrius on 6/23/2017.
+ * Main renderer of libgdx editing app
  */
 
 public class Renderer implements InputProcessor {
     /**
      * The level - a list of all objects in it
      */
-    ArrayList<Object> obj;
+    private ArrayList<Object> obj;
 
     /**
      * Rendering objects
      */
-    OrthographicCamera cam;
-    SpriteBatch batch;
-    ShapeRenderer sr;
+    private OrthographicCamera cam;
+    private SpriteBatch batch;
+    private ShapeRenderer sr;
     public boolean textured = false;
     /**
      * Local rendering variables
@@ -234,7 +235,7 @@ public class Renderer implements InputProcessor {
         return co;
     }
 
-    public void drawThickRect(float x, float y, float dx, float dy, ShapeRenderer sr, float THICC){
+    private void drawThickRect(float x, float y, float dx, float dy, ShapeRenderer sr, float THICC){
 
         /**
          * Draws a thick lined rect using ShapeRenderers rectLine method, thus requires
@@ -339,10 +340,10 @@ public class Renderer implements InputProcessor {
         ArrayList<Object> selected = new ArrayList<Object>();
         for(Object o: obj){
             if(o.getBoundBox().overlaps(selectBox)){
-                if(o.getType().equals("SkyBox") && selectSkyboxes){
+                if(o.getType() == Object.TYPE.SKYBOX && selectSkyboxes){
                     selected.add(o);
                 }
-                if(!(o.getType().equals("SkyBox"))) {
+                if(!(o.getType() == Object.TYPE.SKYBOX)) {
                     selected.add(o);
                 }
             }

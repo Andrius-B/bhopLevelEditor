@@ -17,6 +17,10 @@ import java.util.Stack;
 
 /**
  * Created by Andrius on 6/25/2017.
+ * Event processor of the libgdx app
+ * Also as noted before the canvas receives all the kbd input
+ * so it is channeled up the chain back to the handler in LevelEditor class via parent reference
+ * and the parent addInputEvent function
  */
 
 public class InputEventProcessor {
@@ -30,12 +34,12 @@ public class InputEventProcessor {
     private int selectPointer;
     private Vector2 selectTouch;
     private Operation currentOperation;
-    int clickSelectionCounter = 0;
+    private int clickSelectionCounter = 0;
 
     /**
      * Operation stack
      */
-    Stack<Operation> operations;
+    private Stack<Operation> operations;
 
 
     public InputEventProcessor(Renderer l){
@@ -152,7 +156,7 @@ public class InputEventProcessor {
                     addOperation(currentOperation);
                     //clip.setSelection(clickObject);
                     clip.setTempSelection(new ArrayList<Object>(0));
-                    System.out.print("Click select operation added:"+clickObject.get(0).getType()+" selected\n");
+                    System.out.print("Click select operation added:"+clickObject.get(0).getType().name()+" selected\n");
                 }
             }
         }

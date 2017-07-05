@@ -1,6 +1,10 @@
 package com.bhop.editor.desktop;
 
+import com.badlogic.gdx.math.Vector2;
 import com.bunny.jump.Game.Objects.Object;
+import com.bunny.jump.Game.Objects.SkyBox;
+import com.bunny.jump.Game.Objects.Start;
+import com.sun.javaws.Main;
 
 import org.lwjgl.Sys;
 
@@ -8,6 +12,8 @@ import java.awt.Choice;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -22,23 +28,30 @@ import javax.swing.BoxLayout;
 
 /**
  * Created by Andrius on 6/30/2017.
+ * SidePanel containing modify operation input fields
  */
 
-public class ModifyPanel extends Panel {
-    Panel objectModifyPanel;
-    public ModifyPanel(){
+class ModifyPanel extends Panel {
+    private Panel objectModifyPanel;
+    private GridBagConstraints mainGridBagConstraints;
+    private MainFrameManager parent;
+    private Frame parentFrame;
+    public ModifyPanel(MainFrameManager parent){
         super();
+        this.parent = parent;
+        this.parentFrame = parent.frame;
         //this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
+        mainGridBagConstraints = new GridBagConstraints();
         //gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.gridy = 0;
+        mainGridBagConstraints.gridy = 0;
         Label panelLabel = new Label("Modify");
         //panelLabel.setAlignment(Label.LEFT);
-        this.add(panelLabel,gbc);
+        this.add(panelLabel,mainGridBagConstraints);
 
-        addNewInputField("hey", "love", gbc);
-        addNewInputField("?", "up or perhaps some long content?", gbc);
+        addNewInputField("hey", "love");
+        addNewInputField("?", "up or perhaps some long content?");
+        //setObject("Whatever", gbc);
 
 
     }
@@ -47,22 +60,22 @@ public class ModifyPanel extends Panel {
      *  Adds the input label and textfield pair to this(ModifyPanel parent Panel class)
      * @param labelText - Label text describing the input field
      * @param content - the starting content of the input field
-     * @param c - GridBagConstraints for object insertion
      * @return Array list of components that contain both the label and the input field
      */
-    public ArrayList<Component> addNewInputField(String labelText, String content, GridBagConstraints c){
+    public ArrayList<Component> addNewInputField(String labelText, String content){
         ArrayList<Component> inputRow = new ArrayList<Component>(0);
-        c.gridy+=1;
-        c.gridx = 0;
-        c.anchor = GridBagConstraints.LINE_START;
+        mainGridBagConstraints.gridy+=1;
+        mainGridBagConstraints.gridx = 0;
+        mainGridBagConstraints.anchor = GridBagConstraints.LINE_START;
         Label labelComponent = new Label(labelText);
-        this.add(labelComponent, c);
+        this.add(labelComponent, mainGridBagConstraints);
 
         TextField inputComponent = new TextField(content);
         inputComponent.setColumns(16);
-        c.gridx = 1;
-        c.anchor = GridBagConstraints.LINE_END;
-        this.add(inputComponent, c);
+        inputComponent.setEnabled(false);
+        mainGridBagConstraints.gridx = 1;
+        mainGridBagConstraints.anchor = GridBagConstraints.LINE_END;
+        this.add(inputComponent, mainGridBagConstraints);
 
         inputRow.add(labelComponent);
         inputRow.add(inputComponent);
@@ -72,47 +85,55 @@ public class ModifyPanel extends Panel {
     /**
      *  A function that places the input to a given Panel container
      *  all inputs same as above
-     * @param labelText
-     * @param content
-     * @param c
-     * @param container
+     * @param labelText - input field description
+     * @param content - pre-edit content of the field
+     * @param container - container to put these fields in
      * @return ArrayList of components that contain the label and the input field
      */
-    public ArrayList<Component> addNewInputField(String labelText, String content, GridBagConstraints c, Panel container){
+    public ArrayList<Component> addNewInputField(String labelText, String content, Panel container){
 
         ArrayList<Component> inputRow = new ArrayList<Component>(0);
-        c.gridy+=1;
-        c.gridx = 0;
-        c.anchor = GridBagConstraints.LINE_START;
+        mainGridBagConstraints.gridy+=1;
+        mainGridBagConstraints.gridx = 0;
+        mainGridBagConstraints.anchor = GridBagConstraints.LINE_START;
         Label labelComponent = new Label(labelText);
-        container.add(labelComponent, c);
+        container.add(labelComponent, mainGridBagConstraints);
 
         TextField inputComponent = new TextField(content);
         inputComponent.setColumns(16);
-        c.gridx = 1;
-        c.anchor = GridBagConstraints.LINE_END;
-        container.add(inputComponent, c);
+        mainGridBagConstraints.gridx = 1;
+        mainGridBagConstraints.anchor = GridBagConstraints.LINE_END;
+        container.add(inputComponent, mainGridBagConstraints);
 
         inputRow.add(labelComponent);
         inputRow.add(inputComponent);
         return inputRow;
     }
     public Panel setObject(Object o){
-        System.out.print("ModifyPanel.setObject called on:"+o.getType()+"!\n");
+        System.out.print("ModifyPanel.setObject called on:"+o.getType().name()+"!\n");
         if(objectModifyPanel!=null) {
             this.remove(objectModifyPanel);
+            mainGridBagConstraints.gridy -= 1;
         }
-        Panel objPanel = new Panel(new GridBagLayout());
+        objectModifyPanel = new Panel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
-        Label objectTypeLabel = new Label(o.getType());
+        Label objectTypeLabel = new Label("Editing: "+o.getType().name());
+        Label infoLabel = new Label("This is a test label");
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-        objPanel.add(objectTypeLabel, gbc);
-        objectModifyPanel = objPanel;
-        this.add(objectModifyPanel);
-        return objPanel;
+        objectModifyPanel.add(objectTypeLabel,gbc);
+        gbc.gridy+=1;
+        objectModifyPanel.add(infoLabel, gbc);
+
+        mainGridBagConstraints.anchor = GridBagConstraints.LAST_LINE_START;
+        mainGridBagConstraints.gridy += 1;
+        mainGridBagConstraints.gridx = 0;
+        this.add(objectModifyPanel, mainGridBagConstraints);
+        parent.adjustCanvasSize();
+        System.out.print("Panel added\n");
+        return objectModifyPanel;
     }
 
 

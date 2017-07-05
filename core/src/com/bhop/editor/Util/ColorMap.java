@@ -12,13 +12,14 @@ import com.bunny.jump.States.PlayState;
 
 /**
  * Created by Andrius on 6/24/2017.
+ * This class is pure utility - for containing the whole palette of the editor in one spot
  */
 
 public class ColorMap {
-    public Color getBGColor(){
+    static public Color getBGColor(){
         return Color.valueOf("39333cff");
     }
-    public Color getColor(Object o){
+    static public Color getColor(Object o){
         /**
          * Color-coding of objects
          * For now the colors are pretty much random
@@ -29,18 +30,18 @@ public class ColorMap {
          * For this I have the getType() strings, though this seems to be working as well
          * and I suspect that those Strings are not the most efficient way of accomplishing this task
          */
-        if(o instanceof SkyBox)return Color.valueOf("5458ffff");
-        else if(o instanceof Finish)return Color.valueOf("ff0d62ff");
-        else if(o instanceof Start)return Color.valueOf("2aff00ff");
-        else if(o instanceof ResetBox)return Color.valueOf("ac3397ff");
-        else if(o instanceof VisualBlock)return Color.valueOf("ac7220ff");
-        else if(o instanceof Platform)return Color.valueOf("2dac6cff");
+        if(o.getType() == Object.TYPE.SKYBOX)return Color.valueOf("5458ffff");
+        else if(o.getType() == Object.TYPE.FINISH)return Color.valueOf("ff0d62ff");
+        else if(o.getType() == Object.TYPE.START)return Color.valueOf("2aff00ff");
+        else if(o.getType() == Object.TYPE.RESETBOX)return Color.valueOf("ac3397ff");
+        else if(o.getType() == Object.TYPE.RESETBOX)return Color.valueOf("ac7220ff");
+        else if(o.getType() == Object.TYPE.PLATFORM)return Color.valueOf("2dac6cff");
         return Color.BLACK;
     }
-    public Color getLoadingColor(){
+    static public Color getLoadingColor(){
         return Color.valueOf("d3d3d3ff");
     }
-    public Color getSelectColor(){
+    static public Color getSelectColor(){
         return Color.valueOf("d1d1d10e");
     }
 }

@@ -43,7 +43,7 @@ public class DesktopLauncher {
 	}
 
 	public static void main (String[] arg) {
-		new MainFrame();
+		new MainFrameManager();
 	}
 
 
