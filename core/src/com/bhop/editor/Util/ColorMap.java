@@ -34,7 +34,7 @@ public class ColorMap {
         else if(o.getType() == Object.TYPE.FINISH)return Color.valueOf("ff0d62ff");
         else if(o.getType() == Object.TYPE.START)return Color.valueOf("2aff00ff");
         else if(o.getType() == Object.TYPE.RESETBOX)return Color.valueOf("ac3397ff");
-        else if(o.getType() == Object.TYPE.RESETBOX)return Color.valueOf("ac7220ff");
+        else if(o.getType() == Object.TYPE.VISUALBLOCK)return Color.valueOf("ac7220ff");
         else if(o.getType() == Object.TYPE.PLATFORM)return Color.valueOf("2dac6cff");
         return Color.BLACK;
     }

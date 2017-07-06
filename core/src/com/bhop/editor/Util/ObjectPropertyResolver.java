@@ -9,31 +9,40 @@ import com.bunny.jump.Game.Objects.Object;
  */
 
 public class ObjectPropertyResolver {
-    public PropertyList resolveForObject(Object o){
+    static public PropertyList resolveForObject(Object o){
         PropertyList p = new PropertyList();
+        /**
+         * Resolved by this table:
+         * Object       |pos;dim    |texture    | specific
+         * ----------------------------------------------
+         * Platform     |true       |true       |jumpField
+         * SkyBox       |true       |optional   |
+         * Start/Finish |true       |true       |
+         * ResetBox     |true       |false      |resetFields
+         * VisualBlock  |true       |true       |
+         * ----------------------------------------------
+         */
+        if(o.getType() == Object.TYPE.PLATFORM){
+            p.positionFields = true;
+            p.textureFields = true;
+            p.jumpField = true;
+        }else if(o.getType() == Object.TYPE.SKYBOX){
+            p.positionFields = true;
+            p.textureFields = true;//may be not set, but should be enabled in the ui
+        }else if(o.getType() == Object.TYPE.START || o.getType() == Object.TYPE.FINISH){
+            p.positionFields = true;
+            p.textureFields = true;
+        }else if(o.getType() == Object.TYPE.RESETBOX){
+            p.positionFields = true;
+            p.textureFields = false;
+            p.jumpField = false;
+            p.resetFields = true;
+        }else if(o.getType() == Object.TYPE.VISUALBLOCK){
+            p.positionFields = true;
+            p.textureFields = true;
+            p.jumpField = false;
+            p.resetFields = false;
+        }
         return p;
     }
-}
-
-/**
- * By default this object assumes that every possible field is on the object
- */
-class PropertyList{
-    /**
-     * Object has position and dimension fields
-     */
-    public boolean positionFields = true;
-    /**
-     * Object has texture and repeat texture fields
-     */
-    public boolean textureFields = true;
-    /**
-     * Platforms have jumpSpeed field, which can be edited
-     */
-    public boolean jumpField = true;
-    /**
-     * Reset Fields for resetBoxes
-     */
-    public boolean resetFields = true;
-
 }

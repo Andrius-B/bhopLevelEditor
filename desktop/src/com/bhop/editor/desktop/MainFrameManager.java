@@ -6,20 +6,27 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.bhop.editor.LevelEditor;
 
+import org.lwjgl.Sys;
 import org.lwjgl.opengl.GREMEDYFrameTerminator;
 
+import java.awt.BorderLayout;
 import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.LayoutManager;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.MenuShortcut;
+import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -33,6 +40,10 @@ import java.util.TimerTask;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.OverlayLayout;
+import javax.swing.UIManager;
 
 /**
  * I think it's better to keep the static main function isolated
@@ -42,16 +53,27 @@ import javax.swing.BoxLayout;
 
 public class MainFrameManager {
     private LevelEditor lvlEditor;
-    private  Frame frame;
+    public JFrame frame;
     private Canvas canvas;
+    private ModifyPanel modifyPanel;
+    private JPanel contentPanel;
     public MainFrameManager(){
         lvlEditor = new LevelEditor();
+
+        /**
+         * SWING is pretty ugly tbqh
+         */
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
         /**
          * Preparing the frame
          */
-        frame = new Frame("bhop level editor");
+        frame = new JFrame("bhop level editor");
         frame.setSize(1024, 720);
         //window close handling:
         frame.addWindowListener(new WindowAdapter(){
@@ -74,17 +96,17 @@ public class MainFrameManager {
         config.width = 1024;
         config.samples = 4;//antialiasing
         canvas = new Canvas();
-        adjustCanvasSize();
+        validateResize();
         LwjglApplication app = new LwjglApplication(lvlEditor, config, canvas);
 
 
         /**
          * Window resize event catching
          */
-        frame.addComponentListener(new ComponentListener() {
+        /*frame.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
-                adjustCanvasSize();
+                //validateResize();
             }
 
             @Override
@@ -101,7 +123,7 @@ public class MainFrameManager {
             public void componentHidden(ComponentEvent e) {
 
             }
-        });
+        });*/
         /**
          * Window resize catching end
          */
@@ -167,6 +189,11 @@ public class MainFrameManager {
         pasteMenuItem.addActionListener(editMenuListener);
         editMenu.add(pasteMenuItem);
 
+        MenuItem duplicateMenuItem = new MenuItem("Duplicate", new MenuShortcut(KeyEvent.VK_D));
+        duplicateMenuItem.setActionCommand("Duplicate");
+        duplicateMenuItem.addActionListener(editMenuListener);
+        editMenu.add(duplicateMenuItem);
+
         MenuItem undoMenuItem = new MenuItem("Undo", new MenuShortcut(KeyEvent.VK_Z));
         undoMenuItem.setActionCommand("Undo");
         undoMenuItem.addActionListener(editMenuListener);
@@ -226,30 +253,31 @@ public class MainFrameManager {
         //add menubar to the frame
         frame.setMenuBar(menuBar);
 
-        final ModifyPanel modifyPanel = new ModifyPanel(this);
-        Box modifyPanelBox = new Box(BoxLayout.Y_AXIS);
-        modifyPanelBox.add(modifyPanel);
+        contentPanel = new JPanel();
 
-        frame.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.3; //the modify panel has to be much smaller than the canvas
-        gbc.weighty = 1;
-        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-        gbc.insets = new Insets(8,8,8,8); //some padding
-        frame.add(modifyPanelBox, gbc);
 
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-        gbc.insets = new Insets(0,0,0,0);//remove the padding
-        gbc.fill = GridBagConstraints.BOTH;
-        frame.add(canvas, gbc);
+        contentPanel.setLayout(new BorderLayout());
+        frame.setLayout(new BorderLayout());
+
+        modifyPanel = new ModifyPanel(this);
+        Dimension modifyPanelSize = new Dimension(270,220);
+
+        modifyPanel.setBackground(Color.LIGHT_GRAY);
+
+        modifyPanel.setBounds(8,8, (int)modifyPanelSize.getWidth(), (int)modifyPanelSize.getHeight());
+        modifyPanel.setLocation(8,8);
+
+        frame.add(contentPanel, BorderLayout.CENTER);
+        frame.doLayout();
+
+
+        contentPanel.add(modifyPanel);
+
+        canvas.setBounds(0,0, frame.getWidth(), frame.getHeight());
+        contentPanel.add(canvas);
+
+
+
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
@@ -273,22 +301,11 @@ public class MainFrameManager {
          * TESTING WINDOW END
          */
     }
-    public void adjustCanvasSize(){
-        Graphics g = frame.getGraphics();
-        Dimension d = new Dimension((int)frame.getSize().getWidth(), frame.getHeight());
-        //canvas.setPreferredSize(d);
-        /*System.out.print("Canvas size:"+canvas.getWidth()+";"+canvas.getHeight()+"\n"+
-                         "Prefered size:"+canvas.getPreferredSize().getWidth()+";"+canvas.getPreferredSize().getHeight()+"\n");
-        */
+    public void validateResize(){
         /**
-         * The gridbag is supposed to scale accordingly to the window size
+         * The main content panel has no layout manager so we just change the bounds of our canvas on resize
          */
-        canvas.doLayout();
-        frame.doLayout();
-        frame.validate();
-        frame.update(g);
-        frame.paintAll(g);
-        System.out.print("Resize operation\n");
+        canvas.setBounds(0,0, frame.getWidth(), frame.getHeight());
     }
 }
 
@@ -323,48 +340,71 @@ class EventPoller extends TimerTask {
          */
         com.bhop.editor.Util.InputEvent e = lvlEditor.getCommand();
         if(e.keycode !=-1){
+            /**
+             * Reminder about InputEvent usage
+             * InputEvent.keycode directly correlates with libgdx Input.Keys
+             * InputEvent.ctrlModifier & InputEvent.shiftModifier are just bools that tell weather
+             * the "modifier" keys were pressed at the time of receiving input
+             *
+             * On a side-note this means that every time the modifier keys are pressed (ctrls/shifts both right and left)
+             * an event will end up here.
+             */
             if(e.keycode == Input.Keys.N && e.ctrlModifier && !e.shiftModifier){
                 /**
                  * NEW FILE
+                 * [CTRL+N]
                  */
                 System.out.print("New Item shortcut used\n");
                 lvlEditor.newFile();
             }else if(e.keycode == Input.Keys.S && e.ctrlModifier && !e.shiftModifier){
                 /**
                  * SAVE FILE
+                 * [CTRL+S]
                  */
                 System.out.print("Save Level shortcut used\n");
                 lvlEditor.saveFile();
             }else if(e.keycode == Input.Keys.X && e.ctrlModifier && !e.shiftModifier){
                 /**
                  * EDIT -> CUT
+                 * [CTRL+X]
                  */
                 System.out.print("Cut shortcut used\n");
                 lvlEditor.cut();
             }else if(e.keycode == Input.Keys.C && e.ctrlModifier && !e.shiftModifier){
                 /**
                  * EDIT -> COPY
+                 * [CTRL+C]
                  */
                 System.out.print("Copy shortcut used\n");
                 lvlEditor.copy();
             }else if(e.keycode == Input.Keys.V && e.ctrlModifier && !e.shiftModifier){
                 /**
                  * EDIT -> PASTE
+                 * [CTRL+V]
                  */
                 System.out.print("Paste shortcut used\n");
                 lvlEditor.paste();
             }else if(e.keycode == Input.Keys.Z && e.ctrlModifier && !e.shiftModifier){
                 /**
                  * EDIT -> UNDO
+                 * [CTRL+Z]
                  */
                 System.out.print("Undo shortcut used\n");
                 lvlEditor.undo();
             }else if(e.keycode == Input.Keys.Z && !e.ctrlModifier && !e.shiftModifier){
                 /**
                  * TOGGLE WIREFRAME
+                 * [Z]
                  */
                 System.out.print("Wireframe shortcut used\n");
                 lvlEditor.changeRenderMethod();
+            }else if(e.keycode == Input.Keys.D && e.ctrlModifier && !e.shiftModifier){
+                /**
+                 * EDIT -> DUPLICATE
+                 * [CTRL+D]
+                 */
+                System.out.print("Duplicate shortcut used\n");
+                lvlEditor.duplicate();
             }
         }
     }
@@ -460,6 +500,12 @@ class EditItemListener implements ActionListener {
              */
             System.out.print("Paste selection menu item used\n");
             lvlEditor.paste();
+        }else if(e.getActionCommand().equals("Duplicate")){
+            /**
+             * EDIT -> DUPLICATE
+             */
+            System.out.print("Duplicate selection menu item used\n");
+            lvlEditor.duplicate();
         }else if(e.getActionCommand().equals("Undo")){
             /**
              * EDIT -> UNDO

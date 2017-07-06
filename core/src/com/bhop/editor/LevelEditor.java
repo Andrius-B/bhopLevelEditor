@@ -154,7 +154,9 @@ public class LevelEditor extends ApplicationAdapter {
         System.out.print("Undo handler\n");
         r.removeOperation();
     }
+    public void duplicate(){}
     public void createNew(String type){
 
     }
+
 }
