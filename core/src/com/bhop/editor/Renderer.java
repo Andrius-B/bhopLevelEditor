@@ -71,7 +71,7 @@ public class Renderer implements InputProcessor {
     private Queue<InputEvent> commands;
 
 
-    private InputEventProcessor inputEventProcessor;
+    public InputEventProcessor inputEventProcessor;
 
     public Renderer(){
         obj = new ArrayList<Object>();

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 public class LevelEditor extends ApplicationAdapter {
     private AssetFileHandleResolver resolver = new AssetFileHandleResolver();
-    private Renderer r;
+    public Renderer r;
     private AssetManager manager;
     private LevelManager lvlmngr;
     private InputMultiplexer inputMultiplexer;

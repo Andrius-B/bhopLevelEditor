@@ -15,6 +15,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FileDialog;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -52,11 +53,13 @@ import javax.swing.UIManager;
  */
 
 public class MainFrameManager {
-    private LevelEditor lvlEditor;
+    public LevelEditor lvlEditor;
     public JFrame frame;
     private Canvas canvas;
     private ModifyPanel modifyPanel;
     private JPanel contentPanel;
+
+    private Dimension modifyPanelDimension;
     public MainFrameManager(){
         lvlEditor = new LevelEditor();
 
@@ -74,16 +77,13 @@ public class MainFrameManager {
          * Preparing the frame
          */
         frame = new JFrame("bhop level editor");
+        Font font = new Font("Verdana", Font.PLAIN, 12);
+        frame.setFont(font);
         frame.setSize(1024, 720);
+        modifyPanelDimension = new Dimension(310,250);
         //window close handling:
         frame.addWindowListener(new WindowAdapter(){
             public void windowClosing(WindowEvent e) {
-                //System.out.print("WindowEvent: "+e+"\n");
-				/*try{
-					//dispose();
-				}catch (java.lang.Exception ex){
-					ex.printStackTrace();
-				}*/
                 lvlEditor.exit();
             }
         });
@@ -102,6 +102,8 @@ public class MainFrameManager {
 
         /**
          * Window resize event catching
+         * This section is no longer required, because of the change to the main frame layout
+         * Now with layout manager set to null, the window is less scalable, though
          */
         /*frame.addComponentListener(new ComponentListener() {
             @Override
@@ -259,8 +261,8 @@ public class MainFrameManager {
         contentPanel.setLayout(new BorderLayout());
         frame.setLayout(new BorderLayout());
 
-        modifyPanel = new ModifyPanel(this);
-        Dimension modifyPanelSize = new Dimension(270,220);
+        modifyPanel = new ModifyPanel(this, font);
+        Dimension modifyPanelSize = modifyPanelDimension;
 
         modifyPanel.setBackground(Color.LIGHT_GRAY);
 
@@ -270,12 +272,10 @@ public class MainFrameManager {
         frame.add(contentPanel, BorderLayout.CENTER);
         frame.doLayout();
 
-
         contentPanel.add(modifyPanel);
 
         canvas.setBounds(0,0, frame.getWidth(), frame.getHeight());
         contentPanel.add(canvas);
-
 
 
         frame.setLocationRelativeTo(null);
@@ -284,7 +284,6 @@ public class MainFrameManager {
         EventPoller task = new EventPoller(lvlEditor, modifyPanel);
         Timer eventTimer = new Timer("eventTimer");
         eventTimer.schedule(task, 10, 5);
-
 
         /**
          * TESTING WINDOW:

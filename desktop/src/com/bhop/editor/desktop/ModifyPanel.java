@@ -1,6 +1,7 @@
 package com.bhop.editor.desktop;
 
 import com.badlogic.gdx.math.Vector2;
+import com.bhop.editor.Operations.ModifyOperation;
 import com.bhop.editor.Util.NumericTextField;
 import com.bhop.editor.Util.ObjectPropertyResolver;
 import com.bhop.editor.Util.PropertyList;
@@ -11,6 +12,7 @@ import com.bunny.jump.Game.Objects.ResetBox;
 
 import java.awt.Color;
 
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -41,7 +43,7 @@ enum TextFields{
 class ModifyPanel extends JPanel {
     private JPanel objectModifyPanel;
     private GridBagConstraints mainGridBagConstraints;
-    private MainFrameManager parent;
+    public MainFrameManager parent;
     private Frame parentFrame;
 
     /**
@@ -75,7 +77,7 @@ class ModifyPanel extends JPanel {
      *
      * @param parent - the main frame manager to get the main frame
      */
-    public ModifyPanel(MainFrameManager parent){
+    public ModifyPanel(MainFrameManager parent, Font font){
         super();
         this.parent = parent;
         this.parentFrame = parent.frame;
@@ -88,16 +90,17 @@ class ModifyPanel extends JPanel {
         //panelLabel.setAlignment(Label.LEFT);
         this.add(panelLabel,mainGridBagConstraints);
         listener = new PanelListener(this);
-        arrangeModifyPanel();
+        arrangeModifyPanel(font);
         //setObject("Whatever", gbc);
     }
 
     /**
      * lays out the components, but does not set the data (leaves empty fields and labels)
      */
-    private void arrangeModifyPanel(){
+    private void arrangeModifyPanel(Font font){
         objectModifyPanel = new JPanel(new GridBagLayout());
         objectModifyPanel.setBackground(Color.LIGHT_GRAY);
+        objectModifyPanel.setFont(font);
         GridBagConstraints gbc = new GridBagConstraints();
 
         /**
@@ -109,6 +112,7 @@ class ModifyPanel extends JPanel {
          */
 
         objectTypeLabel = new JLabel("");
+        objectTypeLabel.setFont(font);
         gbc.gridwidth = 3;
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -123,16 +127,19 @@ class ModifyPanel extends JPanel {
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.LINE_START;
         posLabel = new JLabel("Position");
+        posLabel.setFont(font);
         gbc.gridx = 0;
         objectModifyPanel.add(posLabel, gbc);
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.LINE_END;
         xPosField = new NumericTextField(6);
+        xPosField.setFont(font);
         xPosField.getDocument().addDocumentListener(listener);
         xPosField.getDocument().putProperty("fieldName", TextFields.xPosField);
         objectModifyPanel.add(xPosField, gbc);
         gbc.gridx = 2;
         yPosField = new NumericTextField(6);
+        yPosField.setFont(font);
         yPosField.getDocument().addDocumentListener(listener);
         yPosField.getDocument().putProperty("fieldName", TextFields.yPosField);
         objectModifyPanel.add(yPosField,gbc);
@@ -143,16 +150,19 @@ class ModifyPanel extends JPanel {
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.LINE_START;
         dimLabel = new JLabel("Size");
+        dimLabel.setFont(font);
         gbc.gridx = 0;
         objectModifyPanel.add(dimLabel, gbc);
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.LINE_END;
         xDimField = new NumericTextField(6);
+        xDimField.setFont(font);
         xDimField.getDocument().addDocumentListener(listener);
         xDimField.getDocument().putProperty("fieldName", TextFields.xDimField);
         objectModifyPanel.add(xDimField, gbc);
         gbc.gridx = 2;
         yDimField = new NumericTextField(6);
+        yDimField.setFont(font);
         yDimField.getDocument().addDocumentListener(listener);
         yDimField.getDocument().putProperty("fieldName", TextFields.yDimField);
         objectModifyPanel.add(yDimField,gbc);
@@ -163,9 +173,11 @@ class ModifyPanel extends JPanel {
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.LINE_START;
         jumpVelLabel = new JLabel("Jump vel");
+        jumpVelLabel.setFont(font);
         gbc.gridx = 0;
         objectModifyPanel.add(jumpVelLabel, gbc);
         jumpVelField = new NumericTextField(6);
+        jumpVelField.setFont(font);
         jumpVelField.getDocument().addDocumentListener(listener);
         jumpVelField.getDocument().putProperty("fieldName", TextFields.jumpVelField);
         gbc.anchor = GridBagConstraints.LINE_END;
@@ -182,9 +194,11 @@ class ModifyPanel extends JPanel {
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.LINE_START;
         texturePathLabel = new JLabel("Texture");
+        texturePathLabel.setFont(font);
         gbc.gridx = 0;
         objectModifyPanel.add(texturePathLabel, gbc);
         textureField = new JTextField(20);
+        textureField.setFont(font);
         textureField.getDocument().addDocumentListener(listener);
         textureField.getDocument().putProperty("fieldName", TextFields.texturePathField);
         gbc.gridx = 1;
@@ -196,6 +210,7 @@ class ModifyPanel extends JPanel {
 
         gbc.gridy++;
         repeatCheckbox = new JCheckBox("Repeat texture", false);
+        repeatCheckbox.setFont(font);
         repeatCheckbox.setBackground(Color.LIGHT_GRAY);
         gbc.gridx = 0;
         gbc.gridwidth = 3;
@@ -208,22 +223,26 @@ class ModifyPanel extends JPanel {
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.LINE_START;
         resetPointLabel = new JLabel("ResetPoint");
+        resetPointLabel.setFont(font);
         gbc.gridx = 0;
         objectModifyPanel.add(resetPointLabel, gbc);
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.LINE_END;
         xResetPointField = new NumericTextField(6);
+        xResetPointField.setFont(font);
         xResetPointField.getDocument().addDocumentListener(listener);
         xResetPointField.getDocument().putProperty("fieldName", TextFields.xResetPoint);
         objectModifyPanel.add(xResetPointField, gbc);
         gbc.gridx = 2;
         yResetPointField = new NumericTextField(6);
+        yResetPointField.setFont(font);
         yResetPointField.getDocument().addDocumentListener(listener);
         yResetPointField.getDocument().putProperty("fieldName", TextFields.yResetPoint);
         objectModifyPanel.add(yResetPointField,gbc);
 
         gbc.gridy++;
         resetSpeedCheckbox = new JCheckBox("Reset Speed", false);
+        resetSpeedCheckbox.setFont(font);
         resetSpeedCheckbox.setBackground(Color.LIGHT_GRAY);
         gbc.gridwidth = 3;
         gbc.gridx = 0;
@@ -393,11 +412,14 @@ class PanelListener implements DocumentListener{
         }
         TextFields fieldName = (TextFields)source.getProperty("fieldName");
         if (o != null && fieldName!=null) {
+            //hue hue yeah fuck oop
+            ModifyOperation op = new ModifyOperation(parent.parent.lvlEditor.r.inputEventProcessor.clip);
             System.out.print("Textfield changed: "+contents+" | "+fieldName+"\n");
             /**
              * The crazy indentation sort of helps readability,
              * or maybe it's just me
              */
+
             if(      fieldName ==           TextFields.xPosField){
 
                 Vector2 pos = o.getPosition();
