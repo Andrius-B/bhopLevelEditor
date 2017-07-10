@@ -44,6 +44,8 @@ task dist(type: Jar) {
  
     manifest {
         attributes 'Main-Class': project.mainClassName
+        attributes 'Implementation-Title': 'Desktop level editor',
+                   'Implementation-Version': version
     }
 }
 dist.dependsOn classes

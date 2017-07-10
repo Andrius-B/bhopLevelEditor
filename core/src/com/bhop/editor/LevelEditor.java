@@ -8,6 +8,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Queue;
+import com.bhop.editor.Operations.Operation;
 import com.bhop.editor.Util.AssetFileHandleResolver;
 import com.bhop.editor.Util.InputEvent;
 import com.bunny.jump.Game.Objects.Object;
@@ -59,8 +60,12 @@ public class LevelEditor extends ApplicationAdapter {
      * @return Object or null if not one selected
      */
     public Object getSingleSelection(){
+        /**
+         * The null checks are here, because this function is called from the EventPoller thread
+         * and the renderer might not be initialized yet
+         */
         if(r!=null && r.getSelection()!=null && r.getSelection().size()==1){
-            ArrayList<Object> selection =r.getSelection();
+            ArrayList<Object> selection = r.getSelection();
             return selection.get(0);
         }else{
             return null;
@@ -150,9 +155,17 @@ public class LevelEditor extends ApplicationAdapter {
     public void paste(){
         System.out.print("Paste handler\n");
     }
+
+    public void addOperation(Operation o){
+        r.addOperation(o);
+    }
+    public void removeOperation(){
+        r.removeOperation();
+    }
+
     public void undo(){
         System.out.print("Undo handler\n");
-        r.removeOperation();
+        removeOperation();
     }
     public void duplicate(){}
     public void createNew(String type){

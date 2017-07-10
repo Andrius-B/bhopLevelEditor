@@ -65,7 +65,7 @@ public class InputEventProcessor {
         }else if(e.keycode == Input.Keys.G && !e.shiftModifier && !e.ctrlModifier){
             System.out.print("Move the selected Objects");
             Object o = clip.getSelection().get(0);
-            ModifyOperation move = new ModifyOperation(o);
+            ModifyOperation move = new ModifyOperation(clip);
 
             //addOperation();
             return;
@@ -145,16 +145,20 @@ public class InputEventProcessor {
                  * Click select
                  */
                 if(clip.sameClickSelection(clip.getTempSelection())){ //I am not exactly sure why I wrote this check or what it does
-                    if(clickSelectionCounter>=clip.getTempSelection().size()){
-                        clickSelectionCounter = 0;
-                        if(clip.getTempSelection().size()==0)return; //clicked on nothing
-                    }
                     ArrayList<Object> clickObject = new ArrayList<Object>(0);
+                    if(clickSelectionCounter>=clip.getTempSelection().size()){
+
+                        clickSelectionCounter = 0;
+                        if(clip.getTempSelection().size()==0){
+                            currentOperation.setOperation(currentOperation.getOriginal(), clickObject);
+                            addOperation(currentOperation);
+                            return;
+                        }
+                    }
                     clickObject.add(clip.getTempSelection().get(clickSelectionCounter));
                     clickSelectionCounter++;
                     currentOperation.setOperation(currentOperation.getOriginal(), clickObject);
                     addOperation(currentOperation);
-                    //clip.setSelection(clickObject);
                     clip.setTempSelection(new ArrayList<Object>(0));
                     System.out.print("Click select operation added:"+clickObject.get(0).getType().name()+" selected\n");
                 }

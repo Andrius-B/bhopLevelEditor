@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Queue;
+import com.bhop.editor.Operations.Operation;
 import com.bhop.editor.Util.ColorMap;
 import com.bhop.editor.Util.InputEvent;
 import com.bhop.editor.Util.InputEventProcessor;
@@ -97,6 +98,9 @@ public class Renderer implements InputProcessor {
         loading = l;
     }
 
+    public void addOperation(Operation o){
+        inputEventProcessor.addOperation(o);
+    }
     public void removeOperation(){
         inputEventProcessor.removeOperation();
     }

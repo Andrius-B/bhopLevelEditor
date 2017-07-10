@@ -332,6 +332,10 @@ class EventPoller extends TimerTask {
         if(lvlEditor.getSingleSelection()!=null && modObject!=lvlEditor.getSingleSelection()){
             modifyPanel.setObject(lvlEditor.getSingleSelection());
             modObject = lvlEditor.getSingleSelection();
+            modifyPanel.setVisible(true);
+        }else if(lvlEditor.getSingleSelection()==null){
+            modObject = null;
+            modifyPanel.setVisible(false);
         }
 
 

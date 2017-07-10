@@ -23,7 +23,7 @@ public class NumericTextField extends JTextField
 
                 if (!(  (c==KeyEvent.VK_BACK_SPACE)     || (c==KeyEvent.VK_DELETE)
                     ||  (c== KeyEvent.VK_ENTER)         || (c == KeyEvent.VK_TAB)
-                    ||  (Character.isDigit(c))          || c == '.' || c== ',')    )
+                    ||  (Character.isDigit(c))          || c == '.' || c== ',' || "-".contains(""+c))   )
                 {
                     e.consume() ;
                 }
@@ -43,7 +43,12 @@ public class NumericTextField extends JTextField
 
     public float getContent(){
         if(this.getText().equals(""))return 0;
-        return Float.parseFloat(this.getText());
+        try{
+            return Float.parseFloat(this.getText());
+        }catch (Exception e){
+            System.out.print("Couldn't parse numeric text field:"+this.getText()+"\n");
+            return 0;
+        }
     }
 
     public NumericTextField (int _col)

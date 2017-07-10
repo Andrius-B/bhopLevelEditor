@@ -1,5 +1,7 @@
 package com.bhop.editor.Operations;
 
+import com.badlogic.gdx.math.Vector2;
+import com.bhop.editor.Util.ClipBoard;
 import com.bunny.jump.Game.Objects.Object;
 
 /**
@@ -7,18 +9,26 @@ import com.bunny.jump.Game.Objects.Object;
  */
 
 public class ModifyOperation extends Operation {
-    private Object object;
-    public ModifyOperation(Object object){
-        this.object = object;
+    private ClipBoard clip;
+    private Vector2 move;
+    private Vector2 relSize;
+    private float jumpVel;
+    private Vector2 resetPoint;
+    public ModifyOperation(ClipBoard clip){
+        this.clip = clip;
+    }
+
+    public void setMove(Vector2 rel){
+
     }
 
     @Override
     public void applyOperation(){
-        object = (Object) changed;
+        //object = (Object) changed;
     }
 
     @Override
     public void undoOperation(){
-        object = (Object) original;
+        //object = (Object) original;
     }
 }
