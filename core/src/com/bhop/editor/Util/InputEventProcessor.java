@@ -43,7 +43,7 @@ public class InputEventProcessor {
 
 
     public InputEventProcessor(Renderer l){
-        clip = new ClipBoard();
+        this.clip = ClipBoardSingleton.getInstance();
         operations = new Stack<Operation>();
 
         parent = l;
@@ -64,8 +64,8 @@ public class InputEventProcessor {
             return;
         }else if(e.keycode == Input.Keys.G && !e.shiftModifier && !e.ctrlModifier){
             System.out.print("Move the selected Objects");
-            Object o = clip.getSelection().get(0);
-            ModifyOperation move = new ModifyOperation(clip);
+            //Object o = clip.getSelection().get(0);
+            //ModifyOperation move = new ModifyOperation(s);
 
             //addOperation();
             return;
@@ -80,6 +80,7 @@ public class InputEventProcessor {
     }
     public void processTouchDownEvent(int x, int y, int pointer, int button){
         if(button == Input.Buttons.LEFT && selectPointer<=0){
+
             /**
              * a simple left click performs single object selection:
              * cycles through all the objects that are underneath the pointer
@@ -147,7 +148,6 @@ public class InputEventProcessor {
                 if(clip.sameClickSelection(clip.getTempSelection())){ //I am not exactly sure why I wrote this check or what it does
                     ArrayList<Object> clickObject = new ArrayList<Object>(0);
                     if(clickSelectionCounter>=clip.getTempSelection().size()){
-
                         clickSelectionCounter = 0;
                         if(clip.getTempSelection().size()==0){
                             currentOperation.setOperation(currentOperation.getOriginal(), clickObject);
@@ -186,7 +186,9 @@ public class InputEventProcessor {
     }
 
     public void addOperation(Operation o){
+        //System.out.print("Test before apply\n");
         o.applyOperation();
+        //System.out.print("Test after apply\n");
         operations.add(o);
         System.out.print("Operation stack length:"+operations.size()+"\n");
     }

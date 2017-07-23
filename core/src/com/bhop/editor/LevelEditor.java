@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Queue;
 import com.bhop.editor.Operations.Operation;
 import com.bhop.editor.Util.AssetFileHandleResolver;
+import com.bhop.editor.Util.ClipBoard;
 import com.bhop.editor.Util.InputEvent;
 import com.bunny.jump.Game.Objects.Object;
 import com.bunny.jump.LevelManager;
@@ -22,6 +23,7 @@ public class LevelEditor extends ApplicationAdapter {
     public Renderer r;
     private AssetManager manager;
     private LevelManager lvlmngr;
+    public ClipBoard clip;
     private InputMultiplexer inputMultiplexer;
     /**
      * A flag to 'sync' event handling thread and the render thread
@@ -38,10 +40,15 @@ public class LevelEditor extends ApplicationAdapter {
      */
 
     public LevelEditor(){
+        clip = new ClipBoard();
         commands = new Queue<InputEvent>();
     }
 
-	
+
+    public ClipBoard getClip(){
+        return clip;
+    }
+
 	@Override
 	public void create () {
         manager = new AssetManager();
@@ -50,7 +57,8 @@ public class LevelEditor extends ApplicationAdapter {
          * Most of the input is handled by the renderer, because here it is only supposed to affect
          * how the scene is rendered. All file management and other stuff will happen beyond this libgdx app
          */
-        r = new Renderer();
+        r = new Renderer();//pass a reference of the clipboard to most of the objects, to it becomes sort of omni-present
+        //even though this might not perfectly adhere to OOP methodology
         Gdx.input.setInputProcessor(r);
         created = true;
 	}

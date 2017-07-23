@@ -13,6 +13,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Queue;
 import com.bhop.editor.Operations.Operation;
+import com.bhop.editor.Util.ClipBoard;
+import com.bhop.editor.Util.ClipBoardSingleton;
 import com.bhop.editor.Util.ColorMap;
 import com.bhop.editor.Util.InputEvent;
 import com.bhop.editor.Util.InputEventProcessor;
@@ -70,6 +72,7 @@ public class Renderer implements InputProcessor {
      */
     private Queue<InputEvent> commands;
 
+    private ClipBoard clip;
 
     public InputEventProcessor inputEventProcessor;
 
@@ -84,7 +87,7 @@ public class Renderer implements InputProcessor {
 
         lastMMPos = new Vector3();
         commands = new Queue<InputEvent>();
-
+        this.clip = ClipBoardSingleton.getInstance();
         inputEventProcessor = new InputEventProcessor(this);
     }
 
@@ -146,7 +149,7 @@ public class Renderer implements InputProcessor {
              * shape renderer, some times it's nice to have non textured view
              */
 
-            Gdx.gl.glClearColor(clrs.getBGColor().r, clrs.getBGColor().g, clrs.getBGColor().b, clrs.getBGColor().a);
+            Gdx.gl.glClearColor(ColorMap.getBGColor().r, ColorMap.getBGColor().g, ColorMap.getBGColor().b, ColorMap.getBGColor().a);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
             Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -155,7 +158,7 @@ public class Renderer implements InputProcessor {
             sr.setProjectionMatrix(cam.combined);
             sr.begin(ShapeRenderer.ShapeType.Line);
             for (Object o : obj) {
-                sr.setColor(clrs.getColor(o));
+                sr.setColor(ColorMap.getColor(o));
                 Rectangle r = o.getBoundBox();
                 if(inputEventProcessor.clip.isSelected(o)){
                     sr.end();
@@ -163,7 +166,7 @@ public class Renderer implements InputProcessor {
                      * All this work just to highlight what is selected
                      */
                     sr.begin(ShapeRenderer.ShapeType.Filled);
-                    Color selected = clrs.getColor(o);
+                    Color selected = ColorMap.getColor(o);
                     selected.a = 0.7f;
                     sr.setColor(selected);
                     drawThickRect(r.x, r.y, r.getWidth(), r.getHeight(), sr, scroll*scroll/25f);
@@ -185,7 +188,7 @@ public class Renderer implements InputProcessor {
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         sr.setProjectionMatrix(cam.combined);
         sr.begin(ShapeRenderer.ShapeType.Filled);
-        sr.setColor(clrs.getSelectColor());
+        sr.setColor(ColorMap.getSelectColor());
         Rectangle r = inputEventProcessor.getSelectBox();
         if(r!=null){
             sr.rect(r.x, r.y, r.width, r.height);
@@ -197,7 +200,7 @@ public class Renderer implements InputProcessor {
             cam.update();
             sr.setProjectionMatrix(cam.combined);
             sr.begin(ShapeRenderer.ShapeType.Line);
-                sr.setColor(clrs.getLoadingColor());
+                sr.setColor(ColorMap.getLoadingColor());
                 sr.ellipse(-w/2+w*1/100, h/2-w*2/100, w*1/100, w*1.5f/100, rotation, 64);
                 rotation-=5;
             sr.end();
@@ -210,7 +213,7 @@ public class Renderer implements InputProcessor {
     }
 
     public ArrayList<Object> getSelection(){
-        return inputEventProcessor.clip.getSelection();
+        return clip.getSelection();
     }
 
     public void changeRenderMethod(){

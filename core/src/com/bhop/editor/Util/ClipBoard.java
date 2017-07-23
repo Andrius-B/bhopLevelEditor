@@ -27,11 +27,6 @@ public class ClipBoard {
 
     public void setTempSelection(ArrayList<Object> selection){
         this.tempSelection = selection;
-        /*System.out.print("Selection: ");
-        for(Object o: selection){
-            System.out.print(o.getType()+";");
-        }
-        System.out.print("\n");*/
     }
 
     public boolean isSelected(Object o){

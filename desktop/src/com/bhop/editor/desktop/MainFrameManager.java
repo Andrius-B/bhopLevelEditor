@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.bhop.editor.LevelEditor;
+import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.GREMEDYFrameTerminator;
@@ -68,6 +69,9 @@ public class MainFrameManager {
          */
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+            //yeah no
+            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
         } catch (Exception e) {
             e.printStackTrace();
         }

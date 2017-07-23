@@ -1,7 +1,9 @@
 package com.bhop.editor.desktop;
 
 import com.badlogic.gdx.math.Vector2;
+import com.bhop.editor.LevelEditor;
 import com.bhop.editor.Operations.ModifyOperation;
+import com.bhop.editor.Util.ClipBoardSingleton;
 import com.bhop.editor.Util.NumericTextField;
 import com.bhop.editor.Util.ObjectPropertyResolver;
 import com.bhop.editor.Util.PropertyList;
@@ -10,6 +12,8 @@ import com.bunny.jump.Game.Objects.Platform;
 import com.bunny.jump.Game.Objects.ResetBox;
 
 
+import org.lwjgl.Sys;
+
 import java.awt.Color;
 
 import java.awt.Font;
@@ -17,6 +21,7 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Label;
+import java.util.ArrayList;
 
 
 import javax.swing.JCheckBox;
@@ -379,8 +384,10 @@ class ModifyPanel extends JPanel {
 class PanelListener implements DocumentListener{
     private Object o;
     private ModifyPanel parent;
+    private LevelEditor lvlEditor;
     public PanelListener(ModifyPanel parent){
         this.parent = parent;
+        this.lvlEditor = parent.parent.lvlEditor;
     }
 
     public void setObject(Object o){
@@ -412,8 +419,23 @@ class PanelListener implements DocumentListener{
         }
         TextFields fieldName = (TextFields)source.getProperty("fieldName");
         if (o != null && fieldName!=null) {
-            //hue hue yeah fuck oop
-            ModifyOperation op = new ModifyOperation(parent.parent.lvlEditor.r.inputEventProcessor.clip);
+            ArrayList<Object> selected = ClipBoardSingleton.getInstance().getSelection();
+            /*for(Object obj: selected){
+                System.out.print("Modifying object:"+obj.getType().name()+"\n");
+                //System.out.print("Testing object content in the mod panel:"+obj.getPosition().toString()+"\n");
+                //This works
+                int index = lvlEditor.r.getAllObjects().indexOf(obj);
+                boolean found = index >= 0;
+                System.out.print("Found in all obj arrays:"+Boolean.toString(found)+"\n");
+
+                if(!found){
+                    System.out.print("//////////////////////////\nDIDN'T FIND THE SELECTED OBJECT\n//////// Internal error\n");
+                }else{
+                    actual.add(lvlEditor.r.getAllObjects().get(index));
+                }
+            }*/
+            ModifyOperation op = new ModifyOperation(selected);
+
             System.out.print("Textfield changed: "+contents+" | "+fieldName+"\n");
             /**
              * The crazy indentation sort of helps readability,
@@ -421,11 +443,11 @@ class PanelListener implements DocumentListener{
              */
 
             if(      fieldName ==           TextFields.xPosField){
-
+                System.out.print("pos x changed on "+o.getType().name()+"\n");
                 Vector2 pos = o.getPosition();
                 pos.x = parent.xPosField.getContent();
-                o.setPosition(pos);
-                System.out.print("pos x changed on "+o.getType().name()+"\n");
+                op.setMove(pos.sub(o.getPosition()));
+                lvlEditor.addOperation(op);
             }else if(fieldName ==           TextFields.yPosField){
 
             }else if(fieldName ==           TextFields.xDimField){
