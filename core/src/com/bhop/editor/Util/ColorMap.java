@@ -44,4 +44,7 @@ public class ColorMap {
     static public Color getSelectColor(){
         return Color.valueOf("d1d1d10e");
     }
+    static public Color getSelectedResetPointColor(){
+        return Color.valueOf("f4222cff");
+    }
 }

@@ -21,9 +21,12 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Label;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 
+import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -77,6 +80,7 @@ class ModifyPanel extends JPanel {
     public JCheckBox resetSpeedCheckbox;
 
     PanelListener listener;
+    CheckBoxListener checkBoxListener;
 
     /**
      *
@@ -95,6 +99,7 @@ class ModifyPanel extends JPanel {
         //panelLabel.setAlignment(Label.LEFT);
         this.add(panelLabel,mainGridBagConstraints);
         listener = new PanelListener(this);
+        checkBoxListener = new CheckBoxListener(this);
         arrangeModifyPanel(font);
         //setObject("Whatever", gbc);
     }
@@ -215,6 +220,8 @@ class ModifyPanel extends JPanel {
 
         gbc.gridy++;
         repeatCheckbox = new JCheckBox("Repeat texture", false);
+        repeatCheckbox.setActionCommand("repeat");
+        repeatCheckbox.addActionListener(checkBoxListener);
         repeatCheckbox.setFont(font);
         repeatCheckbox.setBackground(Color.LIGHT_GRAY);
         gbc.gridx = 0;
@@ -247,6 +254,8 @@ class ModifyPanel extends JPanel {
 
         gbc.gridy++;
         resetSpeedCheckbox = new JCheckBox("Reset Speed", false);
+        resetSpeedCheckbox.setActionCommand("resetSpeed");
+        resetSpeedCheckbox.addActionListener(checkBoxListener);
         resetSpeedCheckbox.setFont(font);
         resetSpeedCheckbox.setBackground(Color.LIGHT_GRAY);
         gbc.gridwidth = 3;
@@ -259,6 +268,119 @@ class ModifyPanel extends JPanel {
         this.add(objectModifyPanel, mainGridBagConstraints);
     }
 
+    public void updatePanel(Object o){
+        if(o==null)return;
+        this.setObject(o);
+    }
+
+    public JPanel setObjectArray(ArrayList<Object> o){
+        //System.out.print("ModifyPanel.setObject called on:"+o.getType().name()+"!\n");
+        /*
+         * dereference the object in listener, so the change events can be easily ignored
+         */
+
+        listener.setListening(false);
+        PropertyList p = ObjectPropertyResolver.resolveForObjectArray(o);
+
+        /*
+         * Fetching information from generic types
+         */
+        Vector2 pos = new Vector2(0,0);
+        Vector2 dim = new Vector2(100,100);
+        String texturePath = "";
+        boolean repeatTexture = false;
+
+        /*
+         * Fetching information from specific types
+         * For this object's type is checked and then safely cast to
+         * less abstract type
+         */
+        Vector2 resetPoint = new Vector2();
+        boolean resetSpeed = false;
+        float jumpVel = 0f;
+
+
+        objectTypeLabel.setText("Multiple Objects selected");
+
+        if(p.positionFields){
+            posLabel.setEnabled(true);
+            xPosField.setEnabled(true);
+            xPosField.setText(Float.toString(pos.x));
+            yPosField.setEnabled(true);
+            yPosField.setText(Float.toString(pos.y));
+
+            dimLabel.setEnabled(true);
+            xDimField.setEnabled(true);
+            xDimField.setText(Float.toString(dim.x));
+            yDimField.setEnabled(true);
+            yDimField.setText(Float.toString(dim.y));
+        }else{
+            posLabel.setEnabled(false);
+            xPosField.setEnabled(false);
+            xPosField.setText(Float.toString(pos.x));
+            yPosField.setEnabled(false);
+            yPosField.setText(Float.toString(pos.y));
+
+            dimLabel.setEnabled(false);
+            xDimField.setEnabled(false);
+            xDimField.setText(Float.toString(dim.x));
+            yDimField.setEnabled(false);
+            yDimField.setText(Float.toString(dim.y));
+        }
+
+        if(p.textureFields){
+            texturePathLabel.setEnabled(true);
+            textureField.setEnabled(true);
+            textureField.setText(texturePath);
+
+            repeatCheckbox.setEnabled(true);
+            repeatCheckbox.setSelected(repeatTexture);
+        }else{
+            texturePathLabel.setEnabled(false);
+            textureField.setEnabled(false);
+            textureField.setText(texturePath);
+
+            repeatCheckbox.setEnabled(false);
+            repeatCheckbox.setSelected(repeatTexture);
+        }
+
+        if(p.jumpField){
+            jumpVelLabel.setEnabled(true);
+            jumpVelField.setEnabled(true);
+            jumpVelField.setText(Float.toString(jumpVel));
+        }else{
+            jumpVelLabel.setEnabled(false);
+            jumpVelField.setEnabled(false);
+        }
+
+        if(p.resetFields){
+            resetPointLabel.setEnabled(true);
+            xResetPointField.setEnabled(true);
+            xResetPointField.setText(Float.toString(resetPoint.x));
+            yResetPointField.setEnabled(true);
+            yResetPointField.setText(Float.toString(resetPoint.y));
+
+            resetSpeedCheckbox.setEnabled(true);
+            resetSpeedCheckbox.setSelected(resetSpeed);
+        }else{
+            resetPointLabel.setEnabled(false);
+            xResetPointField.setEnabled(false);
+            xResetPointField.setText(Float.toString(resetPoint.x));
+            yResetPointField.setEnabled(false);
+            yResetPointField.setText(Float.toString(resetPoint.y));
+
+            resetSpeedCheckbox.setEnabled(false);
+            resetSpeedCheckbox.setSelected(resetSpeed);
+        }
+        objectModifyPanel.doLayout();
+
+        /**
+         * pass the listener a reference to the new object for modifications
+         */
+        listener.setListening(true);
+        setVisible(true);
+        return objectModifyPanel;
+    }
 
     public JPanel setObject(Object o){
         System.out.print("ModifyPanel.setObject called on:"+o.getType().name()+"!\n");
@@ -266,14 +388,14 @@ class ModifyPanel extends JPanel {
          * dereference the object in listener, so the change events can be easily ignored
          */
 
-        listener.setObject(null);
+        listener.setListening(false);
         PropertyList p = ObjectPropertyResolver.resolveForObject(o);
 
         /**
          * Fetching information from generic types
          */
         Vector2 pos = o.getPosition();
-        Vector2 dim = o.getDimensions();
+        Vector2 dim = o.getDimension();
         String texturePath = o.filepath;
         boolean repeatTexture = o.repeat;
 
@@ -284,12 +406,12 @@ class ModifyPanel extends JPanel {
          */
         Vector2 resetPoint = new Vector2();
         boolean resetSpeed = false;
-        if(o.getType() == Object.TYPE.RESETBOX){
+        if(p.resetFields){
             resetPoint = ((ResetBox)o).getResetPoint();
             resetSpeed = ((ResetBox)o).getRemoveSpeed();
         }
         float jumpVel = 0f;
-        if(o.getType() == Object.TYPE.PLATFORM){
+        if(p.jumpField){
             jumpVel = ((Platform) o).jumpVel;
         }
 
@@ -374,7 +496,7 @@ class ModifyPanel extends JPanel {
         /**
          * pass the listener a reference to the new object for modifications
          */
-        listener.setObject(o);
+        listener.setListening(true);
         setVisible(true);
         return objectModifyPanel;
     }
@@ -385,13 +507,14 @@ class PanelListener implements DocumentListener{
     private Object o;
     private ModifyPanel parent;
     private LevelEditor lvlEditor;
+    private boolean listening = false;
     public PanelListener(ModifyPanel parent){
         this.parent = parent;
         this.lvlEditor = parent.parent.lvlEditor;
     }
 
-    public void setObject(Object o){
-        this.o = o;
+    public void setListening(boolean listening){
+        this.listening = listening;
     }
 
     @Override
@@ -409,60 +532,107 @@ class PanelListener implements DocumentListener{
         common(e);
     }
 
-    private void common(DocumentEvent e){
+    private void common(DocumentEvent e) {
         Document source = e.getDocument();
         String contents = "";
-        try{
+        try {
             contents = source.getText(0, source.getLength());
-        }catch (BadLocationException e1){
+        } catch (BadLocationException e1) {
             System.out.print("Bad location Exception thrown in the DocumentListener handling methods of ModifyPanel\n");
         }
-        TextFields fieldName = (TextFields)source.getProperty("fieldName");
-        if (o != null && fieldName!=null) {
-            ArrayList<Object> selected = ClipBoardSingleton.getInstance().getSelection();
-            /*for(Object obj: selected){
-                System.out.print("Modifying object:"+obj.getType().name()+"\n");
-                //System.out.print("Testing object content in the mod panel:"+obj.getPosition().toString()+"\n");
-                //This works
-                int index = lvlEditor.r.getAllObjects().indexOf(obj);
-                boolean found = index >= 0;
-                System.out.print("Found in all obj arrays:"+Boolean.toString(found)+"\n");
+        TextFields fieldName = (TextFields) source.getProperty("fieldName");
+        ArrayList<Object> selected = ClipBoardSingleton.getInstance().getSelection();
+        if (fieldName == null) {
+            System.out.print("fieldName not found in the edited textfield!\n");
+            return;
+        }
 
-                if(!found){
-                    System.out.print("//////////////////////////\nDIDN'T FIND THE SELECTED OBJECT\n//////// Internal error\n");
-                }else{
-                    actual.add(lvlEditor.r.getAllObjects().get(index));
+        if (listening) {
+            if (selected.size() == 1) {
+                System.out.print("Single object edit!\n");
+                for (Object o : selected) {
+                    ModifyOperation op = new ModifyOperation(selected);
+                    System.out.print("Textfield changed: " + contents + " | " + fieldName + "\n");
+
+
+                    /*
+                        Each field has its own handler, both for single and multiple modify operations
+                     */
+                    if (fieldName == TextFields.xPosField) {
+                        System.out.print("pos x changed on " + o.getType().name() + "\n");
+                        Vector2 pos = o.getPosition();
+                        pos.x = parent.xPosField.getContent();
+                        op.setMove(pos.sub(o.getPosition()));
+                        lvlEditor.addOperation(op);
+                    } else if (fieldName == TextFields.yPosField) {
+                        System.out.print("pos y changed on " + o.getType().name() + "\n");
+                        Vector2 pos = o.getPosition();
+                        pos.y = parent.yPosField.getContent();
+                        op.setMove(pos.sub(o.getPosition()));
+                        lvlEditor.addOperation(op);
+                    } else if (fieldName == TextFields.xDimField) {
+                        System.out.print("dim x changed on " + o.getType().name() + "\n");
+                        Vector2 dim = o.getDimension();
+                        dim.x = parent.xDimField.getContent();
+                        op.setAbsoluteSize(dim);
+                        lvlEditor.addOperation(op);
+                    } else if (fieldName == TextFields.yDimField) {
+                        System.out.print("dim y changed on " + o.getType().name() + "\n");
+                        Vector2 dim = o.getDimension();
+                        dim.y = parent.yDimField.getContent();
+                        op.setAbsoluteSize(dim);
+                        lvlEditor.addOperation(op);
+                    } else if (fieldName == TextFields.jumpVelField) {
+                        System.out.print("jumpVel changed on " + o.getType().name() + "\n");
+                        op.setJump(parent.jumpVelField.getContent());
+                        lvlEditor.addOperation(op);
+                    } else if (fieldName == TextFields.texturePathField) {
+                        System.out.print("textureFiled changed on " + o.getType().name() + "\n");
+                        op.setTexture(parent.textureField.getText());
+                        lvlEditor.addOperation(op);
+                    } else if (fieldName == TextFields.xResetPoint) {
+                        System.out.print("resetPoint x changed on " + o.getType().name() + "\n");
+                        Vector2 rs = ((ResetBox)o).getResetPoint();
+                        rs.x = parent.xResetPointField.getContent();
+                        op.setResetPoint(rs);
+                        lvlEditor.addOperation(op);
+                    } else if (fieldName == TextFields.yResetPoint) {
+                        System.out.print("resetPoint y changed on " + o.getType().name() + "\n");
+                        Vector2 rs = ((ResetBox)o).getResetPoint();
+                        rs.y = parent.yResetPointField.getContent();
+                        op.setResetPoint(rs);
+                        lvlEditor.addOperation(op);
+                    }
+                }
+            }/* else if (selected.size() > 1) {
+                System.out.print("Multiple object edit:\n");
+                for(Object o: selected){
+                    System.out.print(o.getType().name()+"\n");
                 }
             }*/
-            ModifyOperation op = new ModifyOperation(selected);
-
-            System.out.print("Textfield changed: "+contents+" | "+fieldName+"\n");
-            /**
-             * The crazy indentation sort of helps readability,
-             * or maybe it's just me
-             */
-
-            if(      fieldName ==           TextFields.xPosField){
-                System.out.print("pos x changed on "+o.getType().name()+"\n");
-                Vector2 pos = o.getPosition();
-                pos.x = parent.xPosField.getContent();
-                op.setMove(pos.sub(o.getPosition()));
-                lvlEditor.addOperation(op);
-            }else if(fieldName ==           TextFields.yPosField){
-
-            }else if(fieldName ==           TextFields.xDimField){
-
-            }else if(fieldName ==           TextFields.yDimField){
-
-            }else if(fieldName ==           TextFields.jumpVelField){
-
-            }else if(fieldName ==           TextFields.texturePathField){
-
-            }else if(fieldName ==           TextFields.xResetPoint){
-
-            }else if(fieldName ==           TextFields.yResetPoint){
-
-            }
         }
     }
 }
+
+class CheckBoxListener implements ActionListener{
+    LevelEditor lvlEditor;
+    ModifyPanel parent;
+    protected CheckBoxListener(ModifyPanel parent){
+        this.parent = parent;
+        this.lvlEditor = parent.parent.lvlEditor;
+    }
+    public void actionPerformed(ActionEvent actionEvent) {
+        AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
+        boolean selected = abstractButton.getModel().isSelected();
+        ModifyOperation op = new ModifyOperation(ClipBoardSingleton.getInstance().getSelection());
+        if(actionEvent.getActionCommand().equals("repeat")){
+            System.out.print("Repeat checkbox checked: "+Boolean.toString(selected)+"\n");
+            op.setRepeatTexture(selected);
+            lvlEditor.addOperation(op);
+        }else if(actionEvent.getActionCommand().equals("resetSpeed")){
+            System.out.print("resetSpeed checkbox checked: "+Boolean.toString(selected)+"\n");
+            op.setResetSpeed(selected);
+            lvlEditor.addOperation(op);
+        }
+    }
+};

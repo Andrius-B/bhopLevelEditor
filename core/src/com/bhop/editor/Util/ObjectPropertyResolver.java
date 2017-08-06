@@ -2,6 +2,8 @@ package com.bhop.editor.Util;
 
 import com.bunny.jump.Game.Objects.Object;
 
+import java.util.ArrayList;
+
 /**
  * Created by Andrius on 7/5/2017.
  * This class resovles what properties can be modified
@@ -42,6 +44,42 @@ public class ObjectPropertyResolver {
             p.textureFields = true;
             p.jumpField = false;
             p.resetFields = false;
+        }
+        return p;
+    }
+    static public PropertyList resolveForObjectArray(ArrayList<Object> objects){
+        PropertyList p = new PropertyList();
+        p.setAllTrue();
+        /**
+         * Resolved by the same table with a different approach
+         */
+        for(Object o: objects){
+            if (o.getType() == Object.TYPE.PLATFORM) {
+                //p.positionFields = true;
+                //p.textureFields = true;
+                //p.jumpField = true;
+                p.resetFields = false;
+            } else if (o.getType() == Object.TYPE.SKYBOX) {
+                //p.positionFields = true;
+                //p.textureFields = true;
+                p.jumpField = false;
+                p.resetFields = false;
+            } else if (o.getType() == Object.TYPE.START || o.getType() == Object.TYPE.FINISH) {
+                //p.positionFields = true;
+                //p.textureFields = true;
+                p.jumpField = false;
+                p.resetFields = false;
+            } else if (o.getType() == Object.TYPE.RESETBOX) {
+                //p.positionFields = true;
+                p.textureFields = false;
+                p.jumpField = false;
+                //p.resetFields = false;
+            } else if (o.getType() == Object.TYPE.VISUALBLOCK) {
+                //p.positionFields = true;
+                //p.textureFields = true;
+                p.jumpField = false;
+                p.resetFields = false;
+            }
         }
         return p;
     }

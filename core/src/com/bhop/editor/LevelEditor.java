@@ -23,8 +23,6 @@ public class LevelEditor extends ApplicationAdapter {
     public Renderer r;
     private AssetManager manager;
     private LevelManager lvlmngr;
-    public ClipBoard clip;
-    private InputMultiplexer inputMultiplexer;
     /**
      * A flag to 'sync' event handling thread and the render thread
      * basically to load assets from the asset manager to the texture containers
@@ -40,13 +38,7 @@ public class LevelEditor extends ApplicationAdapter {
      */
 
     public LevelEditor(){
-        clip = new ClipBoard();
         commands = new Queue<InputEvent>();
-    }
-
-
-    public ClipBoard getClip(){
-        return clip;
     }
 
 	@Override
@@ -55,7 +47,7 @@ public class LevelEditor extends ApplicationAdapter {
         lvlmngr = new LevelManager();
         /**
          * Most of the input is handled by the renderer, because here it is only supposed to affect
-         * how the scene is rendered. All file management and other stuff will happen beyond this libgdx app
+         * how the scene is rendered
          */
         r = new Renderer();//pass a reference of the clipboard to most of the objects, to it becomes sort of omni-present
         //even though this might not perfectly adhere to OOP methodology
@@ -149,6 +141,12 @@ public class LevelEditor extends ApplicationAdapter {
     }
     public void saveFile(){
         System.out.print("Save to file handler\n");
+        String json = lvlmngr.toJson(r.getAllObjects());
+        //System.out.print("Here is some json:\n");
+        //System.out.print(json);
+        FileHandle level = lvlmngr.getFile();
+        System.out.print("Saving json to file:"+level.path()+"\n");
+        level.writeString(json, false);
     }
     public void exit(){
         System.out.print("Exit handler\n");

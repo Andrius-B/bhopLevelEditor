@@ -5,6 +5,9 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.bhop.editor.LevelEditor;
+import com.bhop.editor.Util.ClipBoard;
+import com.bhop.editor.Util.ClipBoardSingleton;
+import com.bunny.jump.Game.Objects.Object;
 import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 
 import org.lwjgl.Sys;
@@ -37,9 +40,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.sound.sampled.Clip;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -322,6 +327,7 @@ public class MainFrameManager {
 class EventPoller extends TimerTask {
     LevelEditor lvlEditor;
     com.bunny.jump.Game.Objects.Object modObject;
+    ArrayList<Object> modArray;
     ModifyPanel modifyPanel;
     public EventPoller(LevelEditor lvlEditor, ModifyPanel modifyPanel){
         this.lvlEditor = lvlEditor;
@@ -336,9 +342,19 @@ class EventPoller extends TimerTask {
             modifyPanel.setObject(lvlEditor.getSingleSelection());
             modObject = lvlEditor.getSingleSelection();
             modifyPanel.setVisible(true);
-        }else if(lvlEditor.getSingleSelection()==null){
-            modObject = null;
-            modifyPanel.setVisible(false);
+        }else if(lvlEditor.getSingleSelection()==null){ // if multiple or none objects selected
+            ArrayList<Object> selected = ClipBoardSingleton.getInstance().getSelection();
+            /*if(selected.size()>0 && !selected.equals(modArray)){
+                modifyPanel.setObjectArray(selected);
+                modArray = selected;
+                modifyPanel.setVisible(true);
+                System.out.print("Set mod panel to selectedArray and opened it!\n");
+            }else */if(selected.size()<=0 && modifyPanel.isVisible()){
+                System.out.print("Set mod panel object array to null and closing panel!\n");
+                modArray = null;
+                modObject = null;
+                modifyPanel.setVisible(false);
+            }
         }
 
 
@@ -413,6 +429,12 @@ class EventPoller extends TimerTask {
                 System.out.print("Duplicate shortcut used\n");
                 lvlEditor.duplicate();
             }
+            /*
+            * events without a keycode
+            */
+        }else if(e.updateRequest){
+            System.out.print("Update request received and update to panel pushed!\n");
+            modifyPanel.updatePanel(lvlEditor.getSingleSelection());
         }
     }
 }
@@ -464,7 +486,6 @@ class FileItemListener implements ActionListener {
                 FileHandle parentDir = levelFile.parent().parent();
                 lvlEditor.setWorkingDir(parentDir.path()+"/");
                 lvlEditor.setFile(new File(filepath));
-
             }
         }else if(e.getActionCommand().equals("Save")){
             /**

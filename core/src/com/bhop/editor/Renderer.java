@@ -21,6 +21,7 @@ import com.bhop.editor.Util.InputEventProcessor;
 import com.bunny.jump.Game.Objects.Object;
 import com.bunny.jump.Game.Objects.ResetBox;
 import com.bunny.jump.Game.Objects.SkyBox;
+import com.bunny.jump.Game.Objects.VisualBlock;
 
 import java.util.ArrayList;
 
@@ -142,9 +143,18 @@ public class Renderer implements InputProcessor {
                      */
                     ((SkyBox) o).render(batch, offset.x / 10, offset.y / 10);
                 }
+                /*if(o.getType()== Object.TYPE.VISUALBLOCK){
+                    System.out.print("Visual block rendering, has texture:"+
+                            Boolean.toString((((VisualBlock)o).getBlockTexture()!=null)) + "\n" +
+                            "Texture path:"+o.filepath+"\n");
+                    System.out.print("Texture size:"+ ((VisualBlock)o).getBlockTexture().getWidth()+"\n");
+                    System.out.print("Texture filepath:"+o.filepath+"\n");
+
+                    o.updateSprite();
+                }*/
             }
             batch.end();
-        }else{
+        } else{
             /**
              * shape renderer, some times it's nice to have non textured view
              */
@@ -170,6 +180,12 @@ public class Renderer implements InputProcessor {
                     selected.a = 0.7f;
                     sr.setColor(selected);
                     drawThickRect(r.x, r.y, r.getWidth(), r.getHeight(), sr, scroll*scroll/25f);
+                    if(o instanceof ResetBox){
+                        sr.setColor(ColorMap.getSelectedResetPointColor());
+                        Vector2 p = ((ResetBox) o).getResetPoint();
+                        drawThickCross(p.x, p.y, sr, 10, scroll*scroll/25f);
+                        sr.setColor(selected);
+                    }
                     sr.end();
                     sr.begin(ShapeRenderer.ShapeType.Line);
                 }
@@ -257,6 +273,16 @@ public class Renderer implements InputProcessor {
         sr.rectLine(x, y+dy, x+dx, y+dy, THICC);//(2)
         sr.rectLine(x+dx, y+dy, x+dx, y, THICC);//(3)
         sr.rectLine(x+dx, y, x, y, THICC);//(4)
+    }
+
+    private void drawThickCross(float x, float y, ShapeRenderer sr, float size, float THICC){
+        float halfSize = size;
+        Vector2 topLeft = new Vector2(x-halfSize, y+halfSize);
+        Vector2 topRight = new Vector2(x+halfSize, y+halfSize);
+        Vector2 bottomRight = new Vector2(x+halfSize, y-halfSize);
+        Vector2 bottomLeft = new Vector2(x-halfSize, y-halfSize);
+        sr.rectLine(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y, THICC);
+        sr.rectLine(topRight.x, topRight.y, bottomLeft.x, bottomLeft.y, THICC);
     }
 
     public Vector2 getViewport(){

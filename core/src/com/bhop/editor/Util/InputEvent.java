@@ -11,6 +11,7 @@ public class InputEvent {
     public boolean shiftModifier = false;
     public boolean ctrlModifier = false;
     public int keycode = -1;
+    public boolean updateRequest = false;
 
     public InputEvent(int keycode){
         ctrlModifier = Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT) || Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);

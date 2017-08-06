@@ -24,4 +24,13 @@ public class PropertyList{
      */
     public boolean resetFields = false;
 
+    /**
+     * Sets all the fields to true
+     */
+    public void setAllTrue(){
+        this.jumpField = true;
+        this.positionFields = true;
+        this.resetFields = true;
+        this.textureFields = true;
+    }
 }

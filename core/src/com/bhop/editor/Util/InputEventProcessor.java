@@ -199,5 +199,9 @@ public class InputEventProcessor {
         }
         Operation o = operations.pop();
         o.undoOperation();
+        InputEvent i = new InputEvent(-1);
+        i.updateRequest = true;
+        System.out.print("Update request pushed!\n");
+        parent.addInputEvent(i);
     }
 }
