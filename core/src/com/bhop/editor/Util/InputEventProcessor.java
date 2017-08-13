@@ -1,5 +1,6 @@
 package com.bhop.editor.Util;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -21,6 +22,10 @@ import java.util.Stack;
  * Also as noted before the canvas receives all the kbd input
  * so it is channeled up the chain back to the handler in LevelEditor class via parent reference
  * and the parent addInputEvent function
+ * Though this class handles some gestures and generates some operations:
+ *  *Box select (click drag)
+ *  *Grab (G on the keyboard with no modifiers)
+ *  *Reset view (Space on the keyboard with no modifiers)
  */
 
 public class InputEventProcessor {
@@ -35,6 +40,9 @@ public class InputEventProcessor {
     private Vector2 selectTouch;
     private Operation currentOperation;
     private int clickSelectionCounter = 0;
+
+    private boolean grabbed = false;
+    private Vector2 originalGrabPos;
 
     /**
      * Operation stack
@@ -62,13 +70,14 @@ public class InputEventProcessor {
             SelectOperation o = clip.selectAll(parent);
             addOperation(o);
             return;
-        }else if(e.keycode == Input.Keys.G && !e.shiftModifier && !e.ctrlModifier){
-            System.out.print("Move the selected Objects");
-            //Object o = clip.getSelection().get(0);
-            //ModifyOperation move = new ModifyOperation(s);
-
-            //addOperation();
+        }else if(e.keycode == Input.Keys.G && !e.shiftModifier && !e.ctrlModifier && !grabbed){
+            System.out.print("Grabbed the selected Objects\n");
+            grabbed = true;
+            originalGrabPos = parent.getWorldCoordinates(Gdx.input.getX(), Gdx.input.getY());
+            System.out.print("Mouse pos at grab start: ("+ originalGrabPos.x + ";" + originalGrabPos.y +")\n");
             return;
+        }else if(e.keycode == Input.Keys.ENTER &&  !e.shiftModifier && !e.ctrlModifier && grabbed){
+            applyGrab();
         }
         parent.addInputEvent(e);
     }
@@ -78,8 +87,14 @@ public class InputEventProcessor {
     public void processKeyTypedEvent(char key){
 
     }
+    private void applyGrab(){
+        System.out.print("Should apply grab operation\n");
+        Vector2 finalGrabPos = parent.getWorldCoordinates(Gdx.input.getX(), Gdx.input.getY());
+        System.out.print("Move objects by: (" + finalGrabPos.x + ";" + finalGrabPos.y + ")\n");
+        grabbed = false;
+    }
     public void processTouchDownEvent(int x, int y, int pointer, int button){
-        if(button == Input.Buttons.LEFT && selectPointer<=0){
+        if(button == Input.Buttons.LEFT && selectPointer<=0 && !grabbed){
 
             /**
              * a simple left click performs single object selection:
@@ -96,6 +111,9 @@ public class InputEventProcessor {
             clip.setClickObjectSelection(selection);
         }else{
             selectPointer = -1;
+        }
+        if(button == Input.Buttons.LEFT && grabbed) {
+            applyGrab();
         }
 
     }

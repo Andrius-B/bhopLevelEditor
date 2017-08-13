@@ -30,13 +30,8 @@ public abstract class Operation {
         this.original = original;
         this.changed = changed;
     }
-    public void applyOperation(){
-        original = changed;
-    }
-    public void undoOperation(){
-        original = stored;
-    }
-
+    abstract public void applyOperation();
+    abstract public void undoOperation();
     public Object getOriginal(){
         return original;
     }

@@ -176,23 +176,4 @@ public class ModifyOperation extends Operation {
         }
     }
 
-    /**
-     * This function is used for previewing changes real-time without adding the operation to the stack
-     */
-    public void mount(){
-        System.out.print("Mounting the operation\n");
-        //// TODO: 7/24/2017  
-    }
-
-    /**
-     * Internal function for unmounting the preview.
-     * Should be called:
-     *      -Before applying
-     *   or
-     *      -Before discarding the operation
-     */
-    private void unmount(){
-        System.out.print("Unmounting the modify operation\n");
-        //// TODO: 7/24/2017
-    }
 }
